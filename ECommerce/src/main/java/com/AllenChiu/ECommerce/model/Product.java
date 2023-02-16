@@ -15,6 +15,9 @@ public class Product {
 	private Integer price;
 	private Integer stock;
 	private String description;
+	//Date類型預設使用英國格林威治時區(GMT+0)來返回
+	//所以商品的創建時間就會比資料庫的時間早了8個小時
+	//如要設定時區為(GMT+8), 需去application.properties設定.
 	private Date createdDate;
 	private Date LastModifiedDate;
 
