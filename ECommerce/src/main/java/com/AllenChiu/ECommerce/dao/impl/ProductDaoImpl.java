@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -69,5 +70,26 @@ public class ProductDaoImpl implements ProductDao{
 		int productId = keyHolder.getKey().intValue();
 		//最後再將productId回傳出去
 		return productId;
+	}
+
+	@Override
+	public void updateProduct(Integer productId, ProductRequest productRequest) {
+		String sql = "Update product set product_name = :productName, category = :category,image_url = :imageUrl,"
+				+ "price = :price, stock = :stock, description = :description, last_modified_date = :lastModifiedDate\r\n"
+				+ "where product_id = :productId";
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("productId", productId);
+		
+		map.put("productName", productRequest.getProductName());
+		map.put("category", productRequest.getCategory().toString());
+		map.put("imageUrl", productRequest.getImageUrl());
+		map.put("price", productRequest.getPrice());
+		map.put("stock", productRequest.getStock());
+		map.put("description", productRequest.getDescription());
+		//更新最後修改時間的值
+		map.put("lastModifiedDate", new Date());
+		
+		namedParameterJdbcTemplate.update(sql, map);
 	}
 }
