@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,24 +58,34 @@ public class ProductController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(product);
 	}
 
-	//RequestBody註解表示要去接住前端傳來的JSON參數
+	// RequestBody註解表示要去接住前端傳來的JSON參數
 	@PutMapping("/products/{productId}")
 	public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
-											 @RequestBody @Valid ProductRequest productRequest) {
-		//可先加入這端if判斷式先判斷此商品是否存在
+												 @RequestBody @Valid ProductRequest productRequest) {
+		// 可先加入這端if判斷式先判斷此商品是否存在
 		Product product = productService.getProductById(productId);
-		if(product == null) {
+		if (product == null) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
-		
-		//檢查過有此商品後再來進行修改
+
+		// 檢查過有此商品後再來進行修改
 		// update方法並不會返回值
 		productService.updateProduct(productId, productRequest);
 		// 從資料庫取得此商品的數據出來
 		Product updatedProduct = productService.getProductById(productId);
 		// 回傳狀態碼給前端, 並且將從資料庫查詢出來的資料放到body方法裡面傳回給前端
 		return ResponseEntity.status(HttpStatus.OK).body(updatedProduct);
-		
 	}
+
+	@DeleteMapping("/products/{productId}")
+	public ResponseEntity<?> deleteProductById(@PathVariable Integer productId) {
+		
+		// 檢查過有此商品後再來進行刪除
+		// delete方法並不會返回值
+		productService.deleteProductById(productId);
+		
+		// 回傳狀態碼給前端, 表示該數據已被刪除
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	};
 
 }
