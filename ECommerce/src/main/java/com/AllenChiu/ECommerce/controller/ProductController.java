@@ -38,17 +38,30 @@ public class ProductController {
 	//當前端來請求此資源時, 即使商品數據不存在, 但是get/products這個資源是存在的,所以就要回
 	//200給前端.
 	public ResponseEntity<List<Product>> getProducts(
+	//查詢條件filtering
 			//前端可以透過傳進來的category的值,去指定他想要查看的是哪個分類的商品
 			//Spring boot會自動將前端傳過來的字串轉換成productCategory的Enum
 			//應將其設計為可選而不是必選的參數,所以須加上(required = false)
 			@RequestParam (required = false)ProductCategory category,
 			//表示使用者查詢的關鍵字
-			@RequestParam (required = false)String search
+			@RequestParam (required = false)String search,
+			
+	//排序sorting
+			//orderBy表示要根據甚麼欄位來進行排序,使用required = false也是可行的
+			//但是實際上在業界通常會希望根據某東西來進行排序,所以可以加上defaultValue
+			//假設前端沒有傳送orderBy的參數,此orderBy的值就會是預設的值,也就是根據created_date
+			//進行排序
+			@RequestParam (defaultValue = "created_date")String orderBy,
+			//要使用升冪還是降冪
+			@RequestParam (defaultValue = "desc")String sort
 	) {
 		ProductQueryParameter productQueryParameter = new ProductQueryParameter();
 		//將前端傳進來的值set進productQueryParameter裡面
 		productQueryParameter.setCategory(category);
 		productQueryParameter.setSearch(search);
+		productQueryParameter.setOrderBy(orderBy);
+		productQueryParameter.setSort(sort);
+		
 		//再來將productQueryParameter填寫到getProduct裡面的參數,這樣一來之後
 		//就不會因為要新增查詢條件而一直更動DAO層
 		List<Product> productList = productService.getProducts(productQueryParameter);
