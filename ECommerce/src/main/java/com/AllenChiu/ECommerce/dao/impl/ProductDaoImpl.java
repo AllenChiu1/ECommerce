@@ -12,8 +12,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
-import com.AllenChiu.ECommerce.constant.ProductCategory;
 import com.AllenChiu.ECommerce.dao.ProductDao;
+import com.AllenChiu.ECommerce.dto.ProductQueryParameter;
 import com.AllenChiu.ECommerce.dto.ProductRequest;
 import com.AllenChiu.ECommerce.model.Product;
 import com.AllenChiu.ECommerce.rowmapper.ProductRowMapper;
@@ -26,34 +26,34 @@ public class ProductDaoImpl implements ProductDao {
 	private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
 	@Override
-	public List<Product> getProducts(ProductCategory category, String search) {
+	public List<Product> getProducts(ProductQueryParameter productQueryParameter) {
 		//在查詢語句加上where 1=1的原因,是為了要讓下面的查詢條件能夠可以自由地去
 		//拼接在這個sql語法的後面
 		String sql = "select * from product where 1=1";
 		
 		Map<String,Object> map = new HashMap<>();
 		
-		if(category != null) {
+		if(productQueryParameter.getCategory() != null) {
 			//假設該category不是空的,就可以將下面這個sql語句再做拼接
 			//又或者假設category為空, 還是可以查詢到上面的sql的內容
 			//此外,拼接的內容還必須預留一個空白,以防和上述的sql連在一起
 			sql = sql + " AND category = :category";
 			//因為category的參數是Enum類型,所以要使用他的name方法將Enum類型轉成字串
 			//然後再把字串的值加到map裡面
-			map.put("category", category.name());
+			map.put("category", productQueryParameter.getCategory().name());
 		};
 		
-		if(search != null) {
+		if(productQueryParameter.getSearch() != null) {
 			sql = sql + " AND product_name LIKE :search";
 			//%符號為sql語句中like的模糊查詢特性,一定要寫在Map裡面,不能寫在SQL語句
 			//此為Spring JDBC Template中的限制
-			map.put("search", "%" + search + "%");
+			map.put("search", "%" + productQueryParameter + "%");
 		};
 		
 		List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 		return productList;
 	}
-
+	
 	@Override
 	public Product getProductById(Integer productId) {
 		String sql = "select * from product where product_id = :productId";

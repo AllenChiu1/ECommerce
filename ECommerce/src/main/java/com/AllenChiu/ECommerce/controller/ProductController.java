@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.AllenChiu.ECommerce.constant.ProductCategory;
+import com.AllenChiu.ECommerce.dto.ProductQueryParameter;
 import com.AllenChiu.ECommerce.dto.ProductRequest;
 import com.AllenChiu.ECommerce.model.Product;
 import com.AllenChiu.ECommerce.service.ProductService;
@@ -44,7 +45,13 @@ public class ProductController {
 			//表示使用者查詢的關鍵字
 			@RequestParam (required = false)String search
 	) {
-		List<Product> productList = productService.getProducts(category,search);
+		ProductQueryParameter productQueryParameter = new ProductQueryParameter();
+		//將前端傳進來的值set進productQueryParameter裡面
+		productQueryParameter.setCategory(category);
+		productQueryParameter.setSearch(search);
+		//再來將productQueryParameter填寫到getProduct裡面的參數,這樣一來之後
+		//就不會因為要新增查詢條件而一直更動DAO層
+		List<Product> productList = productService.getProducts(productQueryParameter);
 
 		return ResponseEntity.status(HttpStatus.OK).body(productList);
 	};
