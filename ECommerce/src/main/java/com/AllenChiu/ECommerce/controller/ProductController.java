@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.AllenChiu.ECommerce.constant.ProductCategory;
 import com.AllenChiu.ECommerce.dto.ProductRequest;
 import com.AllenChiu.ECommerce.model.Product;
 import com.AllenChiu.ECommerce.service.ProductService;
@@ -34,8 +36,15 @@ public class ProductController {
 	//無論有無查到數據, 都需回200給前端, 因RestFul API設計上的理念, 每一個URL都是一個資源,
 	//當前端來請求此資源時, 即使商品數據不存在, 但是get/products這個資源是存在的,所以就要回
 	//200給前端.
-	public ResponseEntity<List<Product>> getProducts() {
-		List<Product> productList = productService.getProducts();
+	public ResponseEntity<List<Product>> getProducts(
+			//前端可以透過傳進來的category的值,去指定他想要查看的是哪個分類的商品
+			//Spring boot會自動將前端傳過來的字串轉換成productCategory的Enum
+			//應將其設計為可選而不是必選的參數,所以須加上(required = false)
+			@RequestParam (required = false)ProductCategory category,
+			//表示使用者查詢的關鍵字
+			@RequestParam (required = false)String search
+	) {
+		List<Product> productList = productService.getProducts(category,search);
 
 		return ResponseEntity.status(HttpStatus.OK).body(productList);
 	};

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.AllenChiu.ECommerce.constant.ProductCategory;
 import com.AllenChiu.ECommerce.dao.ProductDao;
 import com.AllenChiu.ECommerce.dto.ProductRequest;
 import com.AllenChiu.ECommerce.model.Product;
@@ -18,8 +19,8 @@ public class ProductServiceImpl implements ProductService{
 	private ProductDao productDao;
 	
 	@Override
-	public List<Product> getProducts() {
-		return productDao.getProducts();
+	public List<Product> getProducts(ProductCategory category,String search) {
+		return productDao.getProducts(category,search);
 	};
 	
 	//實作ProductService的抽象方法
