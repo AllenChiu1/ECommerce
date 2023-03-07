@@ -1,8 +1,9 @@
 package com.AllenChiu.ECommerce.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,6 +26,19 @@ public class ProductController {
 	// 為了要取得productService裡面的方法, 故需將其注入.
 	@Autowired
 	private ProductService productService;
+
+	// 查詢所有商品列表數據
+	// getMapping的product一定要為複數,因為是多個產品
+	@GetMapping("/products")
+
+	//無論有無查到數據, 都需回200給前端, 因RestFul API設計上的理念, 每一個URL都是一個資源,
+	//當前端來請求此資源時, 即使商品數據不存在, 但是get/products這個資源是存在的,所以就要回
+	//200給前端.
+	public ResponseEntity<List<Product>> getProducts() {
+		List<Product> productList = productService.getProducts();
+
+		return ResponseEntity.status(HttpStatus.OK).body(productList);
+	};
 
 	// 根據RestFul API的設計原則, 如果想取得某一筆商品的數據, 會是使用Get方法來請求.
 	// 此註解表示要去取得某一商品的數據.
@@ -61,7 +75,7 @@ public class ProductController {
 	// RequestBody註解表示要去接住前端傳來的JSON參數
 	@PutMapping("/products/{productId}")
 	public ResponseEntity<Product> updateProduct(@PathVariable Integer productId,
-												 @RequestBody @Valid ProductRequest productRequest) {
+			@RequestBody @Valid ProductRequest productRequest) {
 		// 可先加入這端if判斷式先判斷此商品是否存在
 		Product product = productService.getProductById(productId);
 		if (product == null) {
@@ -79,11 +93,11 @@ public class ProductController {
 
 	@DeleteMapping("/products/{productId}")
 	public ResponseEntity<?> deleteProductById(@PathVariable Integer productId) {
-		
+
 		// 檢查過有此商品後再來進行刪除
 		// delete方法並不會返回值
 		productService.deleteProductById(productId);
-		
+
 		// 回傳狀態碼給前端, 表示該數據已被刪除
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	};

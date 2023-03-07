@@ -1,5 +1,7 @@
 package com.AllenChiu.ECommerce.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,11 @@ public class ProductServiceImpl implements ProductService{
 	//注入ProductDao將其方法拿來用
 	@Autowired
 	private ProductDao productDao;
+	
+	@Override
+	public List<Product> getProducts() {
+		return productDao.getProducts();
+	};
 	
 	//實作ProductService的抽象方法
 	public Product getProductById(Integer productId) {
@@ -31,5 +38,6 @@ public class ProductServiceImpl implements ProductService{
 	@Override
 	public void deleteProductById(Integer productId) {
 		productDao.deleteProductById(productId);
-	};
+	}
+
 }
