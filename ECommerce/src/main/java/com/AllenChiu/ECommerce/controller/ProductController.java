@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +22,11 @@ import com.AllenChiu.ECommerce.model.Product;
 import com.AllenChiu.ECommerce.service.ProductService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
+//加此註解Max和Min註解才會生效
+@Validated
 //加此註解表示此為Controller層的bean
 @RestController
 public class ProductController {
@@ -53,7 +58,18 @@ public class ProductController {
 			//進行排序
 			@RequestParam (defaultValue = "created_date")String orderBy,
 			//要使用升冪還是降冪
-			@RequestParam (defaultValue = "desc")String sort
+			@RequestParam (defaultValue = "desc")String sort,
+			
+	//分頁pagination
+			//分頁使用defaultValue的原因除了能夠一頁一頁的呈現給使用者看,還能
+			//保護後端存取資料庫的效能,因為可避免一次取得超多數據返回給前端造成效能低落
+			//limit表示這次要取得幾筆商品數據
+			//也可加上Max標籤避免前端一下子傳進太多資料
+			@RequestParam (defaultValue = "5") @Max(1000)@Min(0) Integer limit,
+			//offset表示要去跳過幾筆商品數據
+			//Min標籤可避免offset值是負數
+			@RequestParam (defaultValue = "0")@Min(0)Integer offset
+			
 	) {
 		ProductQueryParameter productQueryParameter = new ProductQueryParameter();
 		//將前端傳進來的值set進productQueryParameter裡面
@@ -61,6 +77,8 @@ public class ProductController {
 		productQueryParameter.setSearch(search);
 		productQueryParameter.setOrderBy(orderBy);
 		productQueryParameter.setSort(sort);
+		productQueryParameter.setLimit(limit);
+		productQueryParameter.setOffset(offset);
 		
 		//再來將productQueryParameter填寫到getProduct裡面的參數,這樣一來之後
 		//就不會因為要新增查詢條件而一直更動DAO層

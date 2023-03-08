@@ -33,6 +33,7 @@ public class ProductDaoImpl implements ProductDao {
 		
 		Map<String,Object> map = new HashMap<>();
 		
+		//查詢條件
 		if(productQueryParameter.getCategory() != null) {
 			//假設該category不是空的,就可以將下面這個sql語句再做拼接
 			//又或者假設category為空, 還是可以查詢到上面的sql的內容
@@ -53,7 +54,15 @@ public class ProductDaoImpl implements ProductDao {
 		//在實作order by或是sort排序這種語法時,只能使用下面字串拼接的方式,而不能使用sql
 		//變數去實作的,這是Spring JDBC Template的設計
 		//此外,不須檢查此二是否為空值,因為已在controller設定defaultValue了
+		//排序
 		sql = sql + " ORDER BY " + productQueryParameter.getOrderBy() + " " + productQueryParameter.getSort();
+		
+		//分頁
+		sql = sql + " LIMIT :limit OFFSET :offset";
+		//下兩個參數沒有為其添加null判斷式,因為在controller層已設定預設值
+		map.put("limit", productQueryParameter.getLimit());
+		map.put("offset", productQueryParameter.getOffset());
+		
 		List<Product> productList = namedParameterJdbcTemplate.query(sql, map, new ProductRowMapper());
 		return productList;
 	}
