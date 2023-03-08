@@ -8,7 +8,7 @@ public class ProductQueryParameter {
 	private String orderBy;
 	private Integer limit;
 	private Integer offset;
-	
+
 	public Integer getLimit() {
 		return limit;
 	}

@@ -144,4 +144,34 @@ public class ProductDaoImpl implements ProductDao {
 		namedParameterJdbcTemplate.update(sql, map);
 	}
 
+	@Override
+	public Integer countProduct(ProductQueryParameter productQueryParameter) {
+		String sql = "Select count(*) from product where 1=1 ";
+		Map<String, Object> map = new HashMap<>();
+		
+		//查詢條件
+		if(productQueryParameter.getCategory() != null) {
+			//假設該category不是空的,就可以將下面這個sql語句再做拼接
+			//又或者假設category為空, 還是可以查詢到上面的sql的內容
+			//此外,拼接的內容還必須預留一個空白,以防和上述的sql連在一起
+			sql = sql + " AND category = :category ";
+			//因為category的參數是Enum類型,所以要使用他的name方法將Enum類型轉成字串
+			//然後再把字串的值加到map裡面
+			map.put("category", productQueryParameter.getCategory().name());
+		};
+		
+		if(productQueryParameter.getSearch() != null) {
+			sql = sql + " AND product_name LIKE :search ";
+			//%符號為sql語句中like的模糊查詢特性,一定要寫在Map裡面,不能寫在SQL語句
+			//此為Spring JDBC Template中的限制
+			map.put("search", "%" + productQueryParameter + "%");
+		};	
+		
+		//下列方法可以取得我們所查詢出來的count值,這方法通常用在取count值的時候
+		//意思就是說我們要將count的值轉換成是一個Integer類型的返回值
+		Integer total = namedParameterJdbcTemplate.queryForObject(sql, map, Integer.class);
+		
+		return total;
+	}
+
 }

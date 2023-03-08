@@ -46,4 +46,9 @@ public class ProductServiceImpl implements ProductService{
 		productDao.deleteProductById(productId);
 	}
 
+	@Override
+	public Integer countProduct(ProductQueryParameter productQueryParameter) {
+		return productDao.countProduct(productQueryParameter);
+	}
+
 }

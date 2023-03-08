@@ -20,6 +20,7 @@ import com.AllenChiu.ECommerce.dto.ProductQueryParameter;
 import com.AllenChiu.ECommerce.dto.ProductRequest;
 import com.AllenChiu.ECommerce.model.Product;
 import com.AllenChiu.ECommerce.service.ProductService;
+import com.AllenChiu.ECommerce.util.Page;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -42,7 +43,7 @@ public class ProductController {
 	//無論有無查到數據, 都需回200給前端, 因RestFul API設計上的理念, 每一個URL都是一個資源,
 	//當前端來請求此資源時, 即使商品數據不存在, 但是get/products這個資源是存在的,所以就要回
 	//200給前端.
-	public ResponseEntity<List<Product>> getProducts(
+	public ResponseEntity<Page<Product>> getProducts(
 	//查詢條件filtering
 			//前端可以透過傳進來的category的值,去指定他想要查看的是哪個分類的商品
 			//Spring boot會自動將前端傳過來的字串轉換成productCategory的Enum
@@ -82,9 +83,23 @@ public class ProductController {
 		
 		//再來將productQueryParameter填寫到getProduct裡面的參數,這樣一來之後
 		//就不會因為要新增查詢條件而一直更動DAO層
+		//取得productList商品列表
 		List<Product> productList = productService.getProducts(productQueryParameter);
-
-		return ResponseEntity.status(HttpStatus.OK).body(productList);
+		
+		//下列的countProduct方法會根據productQueryParameter來計算出商品的總數
+		//傳productQueryParameter的原因是因為在不同的查詢條件下,我們所查詢出來的總筆數
+		//會有點不同.
+		Integer total = productService.countProduct(productQueryParameter);
+		
+		//分頁
+		Page<Product> page = new Page<>();
+		page.setLimit(limit);
+		page.setOffset(offset);
+		page.setTotal(total);
+		//將productList所取得的商品列表放到results裡面
+		page.setResults(productList);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(page);
 	};
 
 	// 根據RestFul API的設計原則, 如果想取得某一筆商品的數據, 會是使用Get方法來請求.
