@@ -34,22 +34,7 @@ public class ProductDaoImpl implements ProductDao {
 		Map<String,Object> map = new HashMap<>();
 		
 		//查詢條件
-		if(productQueryParameter.getCategory() != null) {
-			//假設該category不是空的,就可以將下面這個sql語句再做拼接
-			//又或者假設category為空, 還是可以查詢到上面的sql的內容
-			//此外,拼接的內容還必須預留一個空白,以防和上述的sql連在一起
-			sql = sql + " AND category = :category ";
-			//因為category的參數是Enum類型,所以要使用他的name方法將Enum類型轉成字串
-			//然後再把字串的值加到map裡面
-			map.put("category", productQueryParameter.getCategory().name());
-		};
-		
-		if(productQueryParameter.getSearch() != null) {
-			sql = sql + " AND product_name LIKE :search ";
-			//%符號為sql語句中like的模糊查詢特性,一定要寫在Map裡面,不能寫在SQL語句
-			//此為Spring JDBC Template中的限制
-			map.put("search", "%" + productQueryParameter + "%");
-		};
+		sql = addFilteringSql(sql, map, productQueryParameter);
 		
 		//在實作order by或是sort排序這種語法時,只能使用下面字串拼接的方式,而不能使用sql
 		//變數去實作的,這是Spring JDBC Template的設計
@@ -150,22 +135,7 @@ public class ProductDaoImpl implements ProductDao {
 		Map<String, Object> map = new HashMap<>();
 		
 		//查詢條件
-		if(productQueryParameter.getCategory() != null) {
-			//假設該category不是空的,就可以將下面這個sql語句再做拼接
-			//又或者假設category為空, 還是可以查詢到上面的sql的內容
-			//此外,拼接的內容還必須預留一個空白,以防和上述的sql連在一起
-			sql = sql + " AND category = :category ";
-			//因為category的參數是Enum類型,所以要使用他的name方法將Enum類型轉成字串
-			//然後再把字串的值加到map裡面
-			map.put("category", productQueryParameter.getCategory().name());
-		};
-		
-		if(productQueryParameter.getSearch() != null) {
-			sql = sql + " AND product_name LIKE :search ";
-			//%符號為sql語句中like的模糊查詢特性,一定要寫在Map裡面,不能寫在SQL語句
-			//此為Spring JDBC Template中的限制
-			map.put("search", "%" + productQueryParameter + "%");
-		};	
+		sql = addFilteringSql(sql, map, productQueryParameter);
 		
 		//下列方法可以取得我們所查詢出來的count值,這方法通常用在取count值的時候
 		//意思就是說我們要將count的值轉換成是一個Integer類型的返回值
@@ -174,4 +144,25 @@ public class ProductDaoImpl implements ProductDao {
 		return total;
 	}
 
+	
+	private String addFilteringSql(String sql,Map<String,Object> map,ProductQueryParameter productQueryParameter) {
+		//查詢條件
+				if(productQueryParameter.getCategory() != null) {
+					//假設該category不是空的,就可以將下面這個sql語句再做拼接
+					//又或者假設category為空, 還是可以查詢到上面的sql的內容
+					//此外,拼接的內容還必須預留一個空白,以防和上述的sql連在一起
+					sql = sql + " AND category = :category ";
+					//因為category的參數是Enum類型,所以要使用他的name方法將Enum類型轉成字串
+					//然後再把字串的值加到map裡面
+					map.put("category", productQueryParameter.getCategory().name());
+				};
+				
+				if(productQueryParameter.getSearch() != null) {
+					sql = sql + " AND product_name LIKE :search ";
+					//%符號為sql語句中like的模糊查詢特性,一定要寫在Map裡面,不能寫在SQL語句
+					//此為Spring JDBC Template中的限制
+					map.put("search", "%" + productQueryParameter + "%");
+				};
+				return sql;
+	};
 }
