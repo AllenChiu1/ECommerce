@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.AllenChiu.ECommerce.dao.UserDao;
+import com.AllenChiu.ECommerce.dto.UserLoginRequest;
 import com.AllenChiu.ECommerce.dto.UserRegisterRequest;
 import com.AllenChiu.ECommerce.model.User;
 import com.AllenChiu.ECommerce.service.UserService;
@@ -41,6 +42,22 @@ public class UserServiceImpl implements UserService{
 	public User getUserById(Integer userId) {
 		return userDao.getUserById(userId);
 	}
-	
+
+	@Override
+	public User login(UserLoginRequest userLoginRequest) {
+		User user = userDao.getUserByEmail(userLoginRequest.getEmail());
+		
+		if(user == null) {
+			log.warn("該email {}尚未註冊", userLoginRequest.getEmail());
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+			
+		if(user.getPassword().equals(userLoginRequest.getPassword())) {
+			return user;
+		}else {
+			log.warn("email {}的密碼不正確", userLoginRequest.getEmail());
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+		}
+	}
 	
 }

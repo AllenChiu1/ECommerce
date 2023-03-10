@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.AllenChiu.ECommerce.dto.UserLoginRequest;
 import com.AllenChiu.ECommerce.dto.UserRegisterRequest;
 import com.AllenChiu.ECommerce.model.User;
 import com.AllenChiu.ECommerce.service.UserService;
@@ -31,5 +32,13 @@ public class UserController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(user);
 	};
 	
+	//因登入有資安考量,所以使用Post藉由request body傳遞資訊
+	@PostMapping("/users/login")
+	public ResponseEntity<User> login(@RequestBody @Valid UserLoginRequest userLoginRequest){
+		
+		User user = userService.login(userLoginRequest);
+		
+		return ResponseEntity.status(HttpStatus.OK).body(user);
+	};
 	
 }

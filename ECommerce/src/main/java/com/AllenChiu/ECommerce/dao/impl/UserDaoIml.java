@@ -13,6 +13,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import com.AllenChiu.ECommerce.dao.UserDao;
+import com.AllenChiu.ECommerce.dto.UserLoginRequest;
 import com.AllenChiu.ECommerce.dto.UserRegisterRequest;
 import com.AllenChiu.ECommerce.model.User;
 import com.AllenChiu.ECommerce.rowmapper.UserRowMapper;
@@ -78,4 +79,5 @@ public class UserDaoIml implements UserDao{
 			return null;
 		}
 	}
+
 }
