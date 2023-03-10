@@ -4,6 +4,7 @@ import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.AllenChiu.ECommerce.dao.UserDao;
@@ -32,11 +33,17 @@ public class UserServiceImpl implements UserService{
 			//log的{}裡面的值就會是後面的變數
 			log.warn("該email{}已經被註冊", userRegisterRequest.getEmail());
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-		}else {
+		}
+		
+			//使用MD5生成密碼的雜湊值,將想生成雜湊值的資料填進參數
+			//還需加上getBytes,才能將該字串轉換成byte類型
+			String hashedPassword = DigestUtils.md5DigestAsHex(userRegisterRequest.getPassword().getBytes());
+			//寫如下行,user的密碼就會被我們替換成經過hash雜湊演算的雜湊值存入資料庫
+			userRegisterRequest.setPassword(hashedPassword);
 			//創建帳號
 			return userDao.createUser(userRegisterRequest);
 		}
-	}
+	
 
 	@Override
 	public User getUserById(Integer userId) {
@@ -47,12 +54,17 @@ public class UserServiceImpl implements UserService{
 	public User login(UserLoginRequest userLoginRequest) {
 		User user = userDao.getUserByEmail(userLoginRequest.getEmail());
 		
+		//檢查user是否存在
 		if(user == null) {
 			log.warn("該email {}尚未註冊", userLoginRequest.getEmail());
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
 		}
-			
-		if(user.getPassword().equals(userLoginRequest.getPassword())) {
+		
+		//使用MD5生成密碼的雜湊值
+		String hashedPassword = DigestUtils.md5DigestAsHex(userLoginRequest.getPassword().getBytes());
+		
+		//比較密碼
+		if(user.getPassword().equals(hashedPassword)) {
 			return user;
 		}else {
 			log.warn("email {}的密碼不正確", userLoginRequest.getEmail());
