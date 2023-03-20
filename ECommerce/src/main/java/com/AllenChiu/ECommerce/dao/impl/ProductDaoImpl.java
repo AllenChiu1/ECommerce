@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.validator.internal.util.privilegedactions.NewInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -164,5 +165,18 @@ public class ProductDaoImpl implements ProductDao {
 					map.put("search", "%" + productQueryParameter + "%");
 				};
 				return sql;
+	}
+
+	@Override
+	public void updateStock(Integer productId, Integer stock) {
+		String sql = "UPDATE product SET stock = :stock, last_modified_date = :lastModifiedDate " +
+				"WHERE product_id = :productId";
+		
+		Map<String,Object> map = new HashMap<>();
+		map.put("productId", productId);
+		map.put("stock", stock);
+		map.put("lastModifiedDate", new Date());
+		
+		namedParameterJdbcTemplate.update(sql, map);
 	};
 }
