@@ -11,6 +11,7 @@ import com.AllenChiu.ECommerce.dao.OrderDao;
 import com.AllenChiu.ECommerce.dao.ProductDao;
 import com.AllenChiu.ECommerce.dto.BuyItem;
 import com.AllenChiu.ECommerce.dto.CreateOrderRequest;
+import com.AllenChiu.ECommerce.model.Order;
 import com.AllenChiu.ECommerce.model.OrderItem;
 import com.AllenChiu.ECommerce.model.Product;
 import com.AllenChiu.ECommerce.service.OrderService;
@@ -65,6 +66,22 @@ public class OrderServiceImpl implements OrderService{
 		orderDao.createOrderItems(orderId, orderItemList);
 		
 		return orderId;
+	}
+
+	@Override
+	public Order getOrderById(Integer orderId) {
+		
+		//call orderDao兩次分別去取得order table中的數據
+		Order order = orderDao.getOrderById(orderId);
+		
+		//以及取得order item table中的數據
+		List<OrderItem> orderItemList = orderDao.getOrderItemsByOrderId(orderId);
+		
+		order.setOrderItemList(orderItemList);
+		
+		//現在在這個Order裡面除了會去包含訂單的總資訊以外, 也會去包含這一筆訂單它分別是哪一些
+		//商品的資訊
+		return order;
 	}
 	
 	

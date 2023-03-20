@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.AllenChiu.ECommerce.dto.CreateOrderRequest;
+import com.AllenChiu.ECommerce.model.Order;
 import com.AllenChiu.ECommerce.service.OrderService;
 
 import jakarta.validation.Valid;
@@ -25,7 +26,10 @@ public class OrderController {
 		//此orderId就是資料庫中所創建的orderId
 		Integer orderId = orderService.createOrder(userId, createOrderRequest);
 		
-		return ResponseEntity.status(HttpStatus.CREATED).body(orderId);
+		//除了可以將數據去存入資料庫之外, 同時下列的方法也能將這整筆訂單的資訊去回傳給前端
+		Order order = orderService.getOrderById(orderId);
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(order);
 		
 		
 	};
